@@ -12,50 +12,38 @@ const ListContainer = styled.section`
   justify-content: space-between;
 `;
 
-export default function CharacterList() {
-  // const [characters, setCharacters] = useState([]);
+export default function CharacterList({characters}) {
   const [searchResults, setSearchResults] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    axios.get('https://rickandmortyapi.com/api/character/')
-      .then( response => {
-        setSearchResults(response.data.results);
-      })
-      .catch( err => console.log('Uh oh! Something went wrong. ', err));
-  }, []);
+  
 
   useEffect( () => {
-    const results = searchResults.filter( character => {
-      character.name.toLowerCase().includes(searchTerm.toLowerCase())
-    })
-    console.log(results); //Currently returning an empty array.
+    const results = characters.filter( character => {
+      return character.name.toLowerCase().includes(searchTerm.toLowerCase())});
+
     setSearchResults(results);
   }, [searchTerm])
 
   function handleChange(e) {
     setSearchTerm(e.target.value);
-    console.log(searchTerm); //Search term is being set correctly.
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
   }
 
   return (
     <div>
-      <SearchForm onChange={handleChange} value={searchTerm}/>
-      {/* <form>
-        <label htmlFor='search'>Search: </label>
-        <input 
-          type='text'
-          name='search'
-          id='search'
-          placeholder='type a character name'
-          onChange={handleChange}
-          value={searchTerm}
-          />
-      </form> */}
+      <SearchForm onSubmit={handleSubmit} onChange={handleChange} value={searchTerm}/>
       <ListContainer>
-        {searchResults.map( (character, index) => (
-            <CharacterCard key={index} character={character}/>
-        ))}
+        {searchResults.length > 0 ?
+             searchResults.map( (character) => (
+            <CharacterCard key={character.id} character={character}/>
+        )):
+            characters.map( character => (
+              <CharacterCard key={character.id} character={character}/>
+            ))}
       </ListContainer>
     </div>
   );
